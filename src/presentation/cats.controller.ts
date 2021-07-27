@@ -1,14 +1,20 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, UseFilters } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, SetMetadata, UseFilters, UseGuards, ValidationPipe } from '@nestjs/common';
 import { Cat, CatsService } from 'src/application/cats.service';
+import { AuthGuard } from 'src/auth.guard';
+import { CreateCatDto } from 'src/domain/create-cat.dto';
 import { HttpExceptionFilter } from 'src/http-exception.filter';
-import { CreateCatDto } from './app.controller';
 
 @Controller('cats')
+// パイプや例外フィルタと同様に、ガードもコントローラー、メソッド、グローバルスコープにすることができる
+@UseGuards(AuthGuard)
 export class CatsController {
   constructor(private catsService: CatsService) {}
 
   @Post()
-  async create(@Body() createCatDto: CreateCatDto) {
+  // リクエストボディをバリデーションする場合などはメソッドレベルでパイプをバインドする
+  // @UsePipes(new JoiValidationPipe(schema))
+  // Postのリクエストボディに対してバリデーションする場合は@Bodyの引数にセット
+  async create(@Body(new ValidationPipe) createCatDto: CreateCatDto) {
     this.catsService.create(createCatDto);
   }
 
@@ -26,6 +32,8 @@ export class CatsController {
   }
 
   @Get(":id")
+  // メソッドにメタデータを付与する
+  @SetMetadata("roles", ["admin"])
   // pipeを使用する
   async findOne(@Param("id", ParseIntPipe) id: number) {
     return `id: ${id}`;

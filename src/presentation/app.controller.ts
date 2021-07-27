@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Header, HttpCode, Param, Post, Query, Redirect, Req } from '@nestjs/common';
 import { Request } from 'express';
+import { CreateCatDto } from 'src/domain/create-cat.dto';
 import { AppService } from '../application/app.service';
 
 interface Greed {
@@ -9,11 +10,6 @@ interface Greed {
 
 interface GreedRequest {
   id: number;
-}
-
-export class CreateCatDto {
-  name: string;
-  age: number;
 }
 
 // ルートごとのパスを指定できる
